@@ -1,0 +1,4 @@
+config drone 'drone'
+	option uastype '15'
+	option uasid '12345678'
+	option refresh_rate '6'

@@ -1,0 +1,29 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+
+USE_PROCD=1
+PROG=/usr/bin/odid_sender
+
+service_triggers() {
+	procd_add_reload_trigger gps
+}
+
+start_service() {
+	logger -t opendroneid "start up opendroneid"
+	ARGS=""
+	uastype=$(uci get opendroneid.drone.uastype)
+	[ -n ${uastype} ] && ARGS="${ARGS} -t ${uastype}"
+	uasid=$(uci get opendroneid.drone.uasid)
+	[ -n ${uasid} ] && ARGS="${ARGS} -i ${uasid}"
+	refresh_rate=$(uci get opendroneid.drone.refresh_rate)
+	[ -n ${refresh_rate} ] && ARGS="${ARGS} -r ${refresh_rate}"
+
+	logger -t opendroneid "starting $PROG $ARGS"
+
+	procd_open_instance
+	procd_set_param command $PROG $ARGS
+	procd_set_param respawn
+	procd_close_instance
+}
+
